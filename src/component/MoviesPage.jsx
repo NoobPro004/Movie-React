@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { getMovies } from "../temp/MovieService";
+import Pagination from "./Pagination";
+import List from "./List";
 export default class MoviesPage extends Component {
   state = {
     movies: [],
@@ -90,8 +92,15 @@ this.setState({
       genres:[...this.state.genres,...jsonGenres.genres],
     })
   }
+groupBygenre=(name)=>{
+  this.setState({
+    cGenre:name,
+    currSearchText:""
+  })
+}
+
   render() {
-    let { movies, currSearchText, limit, currentPage,genres } = this.state;
+    let { movies, currSearchText, limit, currentPage,genres,cGenre} = this.state;
 
     let filtereArr=[...this.state.movies];
     
@@ -110,12 +119,7 @@ this.setState({
         return title.startsWith(currSearchText.trim().toLowerCase());
       });
     }
-
-    let pageNumberArr = [];
     let numberofPage=Math.ceil( filtereArr.length / limit );
-
-    for (let i = 0; i < numberofPage; i++)pageNumberArr.push(i + 1);
-    
     let si = (currentPage - 1) * limit;
     let edx = (Number(si)) +(Number(limit));
    
@@ -123,15 +127,7 @@ this.setState({
     return (
       <div className="row">
         <div className="col-3">
-        <ul class="list-group">
-{
-  genres.map((cgObj)=>{
-return(
-<li className="list-group-item" key={cgObj.id}>{cgObj.name}</li>
-)
-  })
-}
-</ul>
+          <List genres={genres} groupBygenre={this.groupBygenre}></List>
         </div>
         <div className="col-9">
           <input
@@ -197,20 +193,15 @@ return(
             </tbody>
           </table>
 
-          <nav aria-label="..." className="col-2">
-            <ul className="pagination pagination-lg ">
-              {pageNumberArr.map((pageNumber) => {
-                let additional=pageNumber==this.state.currentPage ? "page-item active" : "page-item";
-                return (
-                  <li className={additional} aria-current="page" onClick={() => {this.changeCurrentPage(pageNumber)}}>
-                    <span className="page-link">{pageNumber}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+          <Pagination numberofPage={numberofPage} changeCurrentPage={this.changeCurrentPage}></Pagination>
         </div>
       </div>
     );
   }
 }
+
+// filtered array,limit,currentpage,
+// this.changeCurrentPage(pageNumber)
+
+
+
